@@ -32,7 +32,7 @@
     z-index: 0;
   }
 
-  /* ✅ FIX: Gradient stays behind all inputs */
+  /* Gradient stays behind all inputs */
   .gradient-bg {
     position: fixed;
     top: -50%;
@@ -43,7 +43,7 @@
     filter: blur(90px);
     z-index: 0;
     animation: float 8s infinite ease-in-out alternate;
-    pointer-events: none;
+    pointer-events: none; /* don't block clicks */
   }
 
   @keyframes float {
@@ -56,7 +56,7 @@
     width: 95%;
     max-width: 480px;
     position: relative;
-    z-index: 2; /* ✅ ensures inputs above background */
+    z-index: 2; /* ensures inputs above background */
   }
 
   .card {
@@ -89,6 +89,10 @@
     color: #334155;
   }
 
+  input, select, button {
+    font-family: inherit;
+  }
+
   input, select {
     width: 100%;
     padding: 10px 12px;
@@ -99,14 +103,32 @@
     font-size: 0.95rem;
     background: #fff;
     position: relative;
-    z-index: 3; /* ✅ ensure input focusable above everything */
+    z-index: 3; /* ensure inputs focusable above everything */
     transition: box-shadow 0.2s, border 0.2s;
+    -webkit-appearance: none; /* more consistent select appearance on some browsers */
+    appearance: none;
   }
 
   input:focus, select:focus {
     outline: none;
     border: 1px solid var(--primary);
     box-shadow: 0 0 8px var(--primary);
+  }
+
+  /* Add a simple chevron for the select without blocking pointer events */
+  .select-wrap {
+    position: relative;
+  }
+  .select-wrap::after {
+    content: "▾";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #475569;
+    z-index: 4;
+    font-size: 0.95rem;
   }
 
   button {
@@ -120,6 +142,7 @@
     margin-top: 16px;
     width: 100%;
     transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 3;
   }
 
   button:hover {
@@ -150,7 +173,7 @@
 
   .hidden { display: none; }
 
-  /* Animated border */
+  /* Animated border (visual only) */
   .card::before {
     content: "";
     position: absolute;
@@ -164,12 +187,18 @@
     -webkit-mask-composite: xor;
             mask-composite: exclude;
     z-index: 1;
+    pointer-events: none; /* <--- CRITICAL: don't intercept clicks */
   }
 
   @keyframes glow {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+  }
+
+  /* Responsive small tweaks */
+  @media (max-width:420px){
+    .card { padding: 18px; border-radius: 14px; }
   }
 </style>
 </head>
@@ -185,8 +214,8 @@
     <input id="loginUser" type="text" autocomplete="username" placeholder="Enter username" />
     <label>Password</label>
     <input id="loginPass" type="password" autocomplete="current-password" placeholder="Enter password" />
-    <button id="loginBtn">Login</button>
-    <button id="reloadBtn" class="secondary">Reload encrypted file</button>
+    <button id="loginBtn" type="button">Login</button>
+    <button id="reloadBtn" class="secondary" type="button">Reload encrypted file</button>
     <p class="small">Status: <span id="loginStatus">Waiting for encrypted data...</span></p>
     <pre id="debug" class="hidden"></pre>
   </div>
@@ -194,14 +223,17 @@
   <!-- APP CARD -->
   <div class="card hidden" id="appCard">
     <h2>📤 Upload Archive Metadata</h2>
+
     <label>Type</label>
-    <select id="type">
-      <option value="video">Video</option>
-      <option value="pdf">PDF</option>
-      <option value="image">Image</option>
-      <option value="zip">ZIP</option>
-      <option value="other">Other</option>
-    </select>
+    <div class="select-wrap">
+      <select id="type">
+        <option value="video">Video</option>
+        <option value="pdf">PDF</option>
+        <option value="image">Image</option>
+        <option value="zip">ZIP</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
 
     <label>Archive Content URL</label>
     <input id="archiveContentUrl" type="text" placeholder="Enter content URL (any file type)" />
@@ -218,8 +250,8 @@
     <label>Phone number (optional)</label>
     <input id="phoneNumber" type="text" placeholder="+91..." />
 
-    <button id="postBtn">🚀 Post Metadata</button>
-    <button id="logoutBtn" class="secondary">Logout</button>
+    <button id="postBtn" type="button">🚀 Post Metadata</button>
+    <button id="logoutBtn" class="secondary" type="button">Logout</button>
 
     <p class="small">Backend: <code>https://premium_videos_metadata_backend.ajaia-backend.workers.dev/upload</code></p>
     <h3 style="margin-top:10px;">Response</h3>
