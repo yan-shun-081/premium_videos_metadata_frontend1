@@ -31,14 +31,7 @@
     position: relative;
   }
 
-  .wrap {
-    width: 95%;
-    max-width: 480px;
-    position: relative;
-    z-index: 2;
-  }
-
-  /* Floating animated gradient background */
+  /* ✅ FIX: background truly behind all input elements */
   .gradient-bg {
     position: fixed;
     top: -50%;
@@ -47,15 +40,22 @@
     height: 200%;
     background: radial-gradient(circle at 50% 50%, #60a5fa40, #6366f140, #f472b640, transparent);
     filter: blur(90px);
-    z-index: 0;
+    z-index: -1; /* ✅ keep it behind all cards */
     animation: float 8s infinite ease-in-out alternate;
-    pointer-events: none; /* ✅ Fix - prevents blocking input fields */
+    pointer-events: none; /* ✅ don't block inputs */
   }
 
   @keyframes float {
     0% { transform: translate(0, 0); opacity: 0.8; }
     50% { transform: translate(5%, -5%); opacity: 1; }
     100% { transform: translate(-5%, 5%); opacity: 0.8; }
+  }
+
+  .wrap {
+    width: 95%;
+    max-width: 480px;
+    position: relative;
+    z-index: 2;
   }
 
   .card {
@@ -147,7 +147,7 @@
 
   .hidden { display: none; }
 
-  /* Glowing border animation */
+  /* Subtle glowing border animation */
   .card::before {
     content: "";
     position: absolute;
@@ -276,7 +276,11 @@ async function loadEncryptedUsers(){
 /* -------- Login -------- */
 document.getElementById('loginBtn').addEventListener('click',onLogin);
 document.getElementById('reloadBtn').addEventListener('click',loadEncryptedUsers);
-document.getElementById('logoutBtn').addEventListener('click',()=>{document.getElementById('appCard').classList.add('hidden');document.getElementById('loginCard').classList.remove('hidden');setLoginStatus('Logged out','');});
+document.getElementById('logoutBtn').addEventListener('click',()=>{
+  document.getElementById('appCard').classList.add('hidden');
+  document.getElementById('loginCard').classList.remove('hidden');
+  setLoginStatus('Logged out','');
+});
 
 async function onLogin(){
   const u=document.getElementById('loginUser').value.trim();
