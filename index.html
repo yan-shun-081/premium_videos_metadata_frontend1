@@ -3,300 +3,279 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Encrypted-login + Post</title>
+<title>Secure Encrypted Login + Upload Portal</title>
 <style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:#f4f6f8;color:#0b1220}
-  .wrap{max-width:920px;margin:28px auto;padding:18px}
-  .card{background:#fff;border-radius:10px;padding:18px;border:1px solid #e6e9ee;box-shadow:0 6px 18px rgba(11,18,32,0.04);margin-bottom:18px}
-  h2{margin:0 0 10px 0}
-  label{display:block;margin-top:12px;font-weight:600}
-  input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;box-sizing:border-box}
-  .row{display:flex;gap:12px}
-  .col{flex:1}
-  button{background:#2563eb;color:#fff;padding:10px 14px;border:0;border-radius:8px;cursor:pointer;font-weight:700}
-  button.secondary{background:#6b7280;margin-left:8px}
-  .muted{color:#6b7280;font-size:0.95rem}
-  .small{font-size:0.9rem;color:#475569}
-  .error{color:#b91c1c}
-  .success{color:#047857}
-  pre{background:#0b1220;color:#e6ffed;padding:12px;border-radius:8px;overflow:auto}
-  .hidden{display:none}
+  :root {
+    --primary: #2563eb;
+    --secondary: #64748b;
+    --bg1: #0f172a;
+    --bg2: #1e293b;
+    --card: #f9fafb;
+    --text: #0f172a;
+    --success: #10b981;
+    --error: #ef4444;
+  }
+
+  body {
+    font-family: 'Poppins', system-ui, sans-serif;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    width: 95%;
+    max-width: 480px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    margin-bottom: 22px;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h2 {
+    text-align: center;
+    color: var(--primary);
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    box-sizing: border-box;
+    margin-top: 6px;
+    font-size: 0.95rem;
+  }
+
+  button {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    margin-top: 12px;
+    width: 100%;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background: #1d4ed8;
+  }
+
+  button.secondary {
+    background: var(--secondary);
+  }
+
+  .small {
+    font-size: 0.9rem;
+    color: #475569;
+    margin-top: 8px;
+  }
+
+  .error { color: var(--error); font-weight: 600; }
+  .success { color: var(--success); font-weight: 600; }
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 12px;
+    overflow-x: auto;
+  }
+
+  .hidden { display: none; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card" id="statusCard">
-    <h2>App status</h2>
-    <p class="muted">This page automatically fetches and decrypts <code>encrypted.txt</code> from the same folder.</p>
-    <p>Status: <strong id="status">Initializing...</strong></p>
-    <p class="small" id="note">If you use GitHub Pages, keep <code>index.html</code> and <code>encrypted.txt</code> together in repo root.</p>
-  </div>
 
+  <!-- LOGIN CARD -->
   <div class="card" id="loginCard">
-    <h2>Sign in</h2>
+    <h2>🔒 Secure Login</h2>
     <label>Username</label>
-    <input id="loginUser" type="text" autocomplete="username" />
+    <input id="loginUser" type="text" autocomplete="username" placeholder="Enter username" />
     <label>Password</label>
-    <input id="loginPass" type="password" autocomplete="current-password" />
-    <div style="margin-top:12px;">
-      <button id="loginBtn">Login</button>
-      <button id="reloadBtn" class="secondary">Reload encrypted file</button>
-    </div>
+    <input id="loginPass" type="password" autocomplete="current-password" placeholder="Enter password" />
+    <button id="loginBtn">Login</button>
+    <button id="reloadBtn" class="secondary">Reload encrypted file</button>
     <p class="small">Status: <span id="loginStatus">Waiting for encrypted data...</span></p>
     <pre id="debug" class="hidden"></pre>
   </div>
 
+  <!-- APP CARD -->
   <div class="card hidden" id="appCard">
-    <h2>Create post</h2>
-    <p class="muted">Select type and provide URLs & metadata. Click <strong>Post</strong>.</p>
-
+    <h2>📤 Upload Archive Metadata</h2>
     <label>Type</label>
-    <select id="type"><option value="video">video</option><option value="pdf">pdf</option></select>
+    <select id="type">
+      <option value="video">Video</option>
+      <option value="pdf">PDF</option>
+      <option value="image">Image</option>
+      <option value="zip">ZIP</option>
+      <option value="other">Other</option>
+    </select>
 
     <label>Archive Content URL</label>
-    <input id="archiveContentUrl" type="text" placeholder="https://example.com/page-or-direct-file" />
+    <input id="archiveContentUrl" type="text" placeholder="Enter content URL (any file type)" />
 
-    <label>Archive Image URL (thumbnail)</label>
-    <input id="archiveImageUrl" type="text" placeholder="https://example.com/thumb-page-or-image" />
+    <label>Thumbnail / Image URL</label>
+    <input id="archiveImageUrl" type="text" placeholder="Enter image URL" />
 
     <label>Title</label>
-    <input id="title" type="text" />
+    <input id="title" type="text" placeholder="Enter title" />
 
-    <div class="row">
-      <div class="col">
-        <label>Username</label>
-        <input id="postUsername" type="text" />
-      </div>
-      <div class="col">
-        <label>Phone number</label>
-        <input id="phoneNumber" type="text" />
-      </div>
-    </div>
+    <label>Username</label>
+    <input id="postUsername" type="text" readonly />
 
-    <div style="margin-top:12px;">
-      <button id="postBtn">Post</button>
-      <button id="logoutBtn" class="secondary">Logout</button>
-    </div>
+    <label>Phone number (optional)</label>
+    <input id="phoneNumber" type="text" placeholder="+91..." />
 
-    <p class="small" style="margin-top:12px">Backend: <code id="backendUrl">https://premium_videos_metadata_backend.ajaia-backend.workers.dev</code></p>
-    <h3>Response</h3>
+    <button id="postBtn">Post</button>
+    <button id="logoutBtn" class="secondary">Logout</button>
+
+    <p class="small">Backend: <code>https://premium_videos_metadata_backend.ajaia-backend.workers.dev/upload</code></p>
+    <h3 style="margin-top:10px;">Response</h3>
     <pre id="responseArea">—</pre>
   </div>
 </div>
 
 <script>
-/* -----------------------
-  CONFIG — edit if needed
-------------------------*/
-const passphrase = "MyPassphrase123!";             // <--- change if needed
-const encryptedFile = "encrypted.txt";             // file path relative to index.html
-const backendUrl = "https://premium_videos_metadata_backend.ajaia-backend.workers.dev";
+const passphrase = "MyPassphrase123!";
+const encryptedFile = "encrypted.txt";
+const backendUrl = "https://premium_videos_metadata_backend.ajaia-backend.workers.dev/upload";
 
-/* -----------------------
-  Utilities
-------------------------*/
-function setStatus(msg){ document.getElementById('status').textContent = msg; }
-function setLoginStatus(msg, cls=''){ const el = document.getElementById('loginStatus'); el.textContent = msg; el.className = cls; }
-function debugShow(s){ const d=document.getElementById('debug');d.textContent=s;d.classList.remove('hidden'); }
+/* -------- Utilities -------- */
+function setLoginStatus(msg, cls=''){ const el=document.getElementById('loginStatus'); el.textContent=msg; el.className=cls; }
+function debugShow(s){ const d=document.getElementById('debug'); d.textContent=s; d.classList.remove('hidden'); }
 function debugHide(){ document.getElementById('debug').classList.add('hidden'); }
 
-function b64ToArrayBuffer(b64){
-  const bin = atob(b64);
-  const len = bin.length;
-  const bytes = new Uint8Array(len);
-  for(let i=0;i<len;i++) bytes[i]=bin.charCodeAt(i);
-  return bytes.buffer;
-}
+function b64ToArrayBuffer(b64){ const bin=atob(b64); const len=bin.length; const bytes=new Uint8Array(len); for(let i=0;i<len;i++) bytes[i]=bin.charCodeAt(i); return bytes.buffer; }
 function abToStr(buf){ return new TextDecoder().decode(buf); }
 
-/* -----------------------
-  Crypto helpers (PBKDF2 -> AES-GCM)
-  encrypted.txt must be JSON:
-  { "salt":"base64", "iv":"base64", "iterations":200000, "payload":"base64(ciphertext||tag)" }
-------------------------*/
+/* -------- Crypto -------- */
 async function deriveKey(pass, saltB64, iterations){
-  const salt = new Uint8Array(b64ToArrayBuffer(saltB64));
-  const pwUtf8 = new TextEncoder().encode(pass);
-  const baseKey = await crypto.subtle.importKey('raw', pwUtf8, {name:'PBKDF2'}, false, ['deriveKey']);
-  return crypto.subtle.deriveKey(
-    { name:'PBKDF2', salt, iterations, hash:'SHA-256' },
-    baseKey,
-    { name:'AES-GCM', length:256 },
-    false,
-    ['decrypt']
-  );
+  const salt=new Uint8Array(b64ToArrayBuffer(saltB64));
+  const pwUtf8=new TextEncoder().encode(pass);
+  const baseKey=await crypto.subtle.importKey('raw', pwUtf8, {name:'PBKDF2'}, false, ['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations,hash:'SHA-256'}, baseKey, {name:'AES-GCM',length:256}, false, ['decrypt']);
 }
 
 async function decryptEncryptedJson(encJson){
-  const iterations = encJson.iterations || 200000;
-  const key = await deriveKey(passphrase, encJson.salt, iterations);
-  const iv = new Uint8Array(b64ToArrayBuffer(encJson.iv));
-  const payloadBuf = b64ToArrayBuffer(encJson.payload);
-  const plainBuf = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, payloadBuf);
-  return abToStr(plainBuf); // plaintext string
+  const key=await deriveKey(passphrase, encJson.salt, encJson.iterations||200000);
+  const iv=new Uint8Array(b64ToArrayBuffer(encJson.iv));
+  const payloadBuf=b64ToArrayBuffer(encJson.payload);
+  const plainBuf=await crypto.subtle.decrypt({name:'AES-GCM',iv}, key, payloadBuf);
+  return abToStr(plainBuf);
 }
 
-/* -----------------------
-  Load & decrypt user list
-------------------------*/
-let usersList = []; // array of {username,password}
+/* -------- Load & Decrypt -------- */
+let usersList=[];
 async function loadEncryptedUsers(){
-  setStatus('Fetching encrypted file...');
-  setLoginStatus('Loading encrypted data...', '');
+  setLoginStatus('Loading encrypted file...');
   try{
-    const r = await fetch(encryptedFile, {cache:'no-store'});
+    const r=await fetch(encryptedFile,{cache:'no-store'});
     if(!r.ok) throw new Error('Fetch failed: '+r.status);
-    const txt = (await r.text()).trim();
-    let encJson;
-    try { encJson = JSON.parse(txt); } catch(e){ throw new Error('Encrypted file is not valid JSON'); }
-    setStatus('Deriving key & decrypting...');
-    const plaintext = await decryptEncryptedJson(encJson);
-    const parsed = JSON.parse(plaintext);
-    if(!Array.isArray(parsed)) throw new Error('Decrypted plaintext must be JSON array of users');
-    usersList = parsed;
-    setStatus('Encrypted users loaded. Ready.');
-    setLoginStatus('Ready to login', 'success');
+    const txt=(await r.text()).trim();
+    const encJson=JSON.parse(txt);
+    const plaintext=await decryptEncryptedJson(encJson);
+    const parsed=JSON.parse(plaintext);
+    if(!Array.isArray(parsed)) throw new Error('Decrypted data invalid');
+    usersList=parsed;
+    setLoginStatus('Ready to login','success');
     debugHide();
-  } catch(err){
-    usersList = [];
-    setStatus('Error loading encrypted file');
-    setLoginStatus('Error: '+err.message, 'error');
+  }catch(err){
+    setLoginStatus('Error: '+err.message,'error');
     debugShow(String(err));
-    console.error(err);
   }
 }
 
-/* -----------------------
-  Login handling
-------------------------*/
-document.getElementById('loginBtn').addEventListener('click', onLogin);
-document.getElementById('reloadBtn').addEventListener('click', loadEncryptedUsers);
-document.getElementById('logoutBtn').addEventListener('click', ()=>{ document.getElementById('appCard').classList.add('hidden'); document.getElementById('loginCard').classList.remove('hidden'); setLoginStatus('Logged out',''); });
+/* -------- Login -------- */
+document.getElementById('loginBtn').addEventListener('click',onLogin);
+document.getElementById('reloadBtn').addEventListener('click',loadEncryptedUsers);
+document.getElementById('logoutBtn').addEventListener('click',()=>{document.getElementById('appCard').classList.add('hidden');document.getElementById('loginCard').classList.remove('hidden');setLoginStatus('Logged out','');});
 
 async function onLogin(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  if(!u || !p){ setLoginStatus('Enter username and password','error'); return; }
-  if(!usersList || usersList.length===0){ setLoginStatus('User list empty — reload encrypted file','error'); return; }
-  setLoginStatus('Checking credentials...');
-  const ok = usersList.some(row => String(row.username)===u && String(row.password)===p);
-  if(!ok){ setLoginStatus('Username or password is incorrect','error'); return; }
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(!u||!p){setLoginStatus('Enter username and password','error');return;}
+  const ok=usersList.some(row=>String(row.username)===u && String(row.password)===p);
+  if(!ok){setLoginStatus('Invalid username or password','error');return;}
   setLoginStatus('Login successful','success');
-  // show app
   document.getElementById('loginCard').classList.add('hidden');
   document.getElementById('appCard').classList.remove('hidden');
-  document.getElementById('postUsername').value = u;
+  document.getElementById('postUsername').value=u;
 }
 
-/* -----------------------
-  Link extraction helpers
-  - simple: if url endsWith ext, return it
-  - fallback: try to fetch the page and find links with ext (may fail due to CORS)
-------------------------*/
-function urlEndsWithExt(url, ext){
-  if(!url) return false;
+/* -------- Universal Link Extractor -------- */
+async function extractLink(url){
+  if(!url) return null;
   try{
-    const path = url.split('?')[0].split('#')[0].toLowerCase();
-    return path.endsWith('.'+ext.toLowerCase());
-  }catch(e){return false;}
-}
-
-async function extractLink(url, ext){
-  // direct link check
-  if(urlEndsWithExt(url, ext)) return url;
-  // otherwise try to fetch page and search for links
-  try{
-    const resp = await fetch(url, {mode:'cors'});
+    const resp=await fetch(url,{mode:'cors'});
     if(!resp.ok) throw new Error('Fetch failed: '+resp.status);
-    const html = await resp.text();
-    // find href/src ending with ext
-    const rx = new RegExp('(href|src)\\s*=\\s*["\']([^"\']+\\.'+ext+')(?:["\'])', 'ig');
-    let m;
-    while((m = rx.exec(html)) !== null){
-      try{ const resolved = new URL(m[2], resp.url).href; return resolved; } catch(e){}
-    }
-    // general https links
-    const rx2 = new RegExp('https?://[^"\'\\s>]*\\.'+ext, 'ig');
-    const m2 = rx2.exec(html);
-    if(m2) return m2[0];
-    return null;
-  }catch(err){
-    console.warn('extractLink error', err);
-    return null;
-  }
+    const html=await resp.text();
+    const rx=/https?:\/\/[^"'\\s>]+?\.(mp4|pdf|jpg|jpeg|png|zip|rar|gif|webm|mkv|avi|mov)/ig;
+    const match=rx.exec(html);
+    if(match) return match[0];
+  }catch(e){}
+  // fallback — if direct file link
+  if(/\.(mp4|pdf|jpg|jpeg|png|zip|rar|gif|webm|mkv|avi|mov)$/i.test(url)) return url;
+  return null;
 }
 
-/* -----------------------
-  Post handling
-------------------------*/
-document.getElementById('postBtn').addEventListener('click', async ()=>{
-  const type = document.getElementById('type').value;
-  const archiveContentUrl = document.getElementById('archiveContentUrl').value.trim();
-  const archiveImageUrl = document.getElementById('archiveImageUrl').value.trim();
-  const title = document.getElementById('title').value.trim();
-  const posterUsername = document.getElementById('postUsername').value.trim();
-  const phoneNumber = document.getElementById('phoneNumber').value.trim();
-  const respArea = document.getElementById('responseArea');
+/* -------- Post -------- */
+document.getElementById('postBtn').addEventListener('click',async()=>{
+  const type=document.getElementById('type').value;
+  const archiveContentUrl=document.getElementById('archiveContentUrl').value.trim();
+  const archiveImageUrl=document.getElementById('archiveImageUrl').value.trim();
+  const title=document.getElementById('title').value.trim();
+  const username=document.getElementById('postUsername').value.trim();
+  const phone=document.getElementById('phoneNumber').value.trim();
+  const respArea=document.getElementById('responseArea');
 
-  respArea.textContent = 'Validating...';
-  if(!archiveContentUrl || !archiveImageUrl || !title || !posterUsername){ respArea.textContent='Please fill required fields.'; return; }
+  if(!archiveContentUrl||!archiveImageUrl||!title||!username){respArea.textContent='Please fill all required fields.';return;}
+  respArea.textContent='Extracting content...';
+  const contentLink=await extractLink(archiveContentUrl);
+  const imageLink=await extractLink(archiveImageUrl);
+  if(!contentLink){respArea.textContent='Cannot extract valid content URL';return;}
+  if(!imageLink){respArea.textContent='Cannot extract valid image URL';return;}
 
-  respArea.textContent = 'Extracting content link...';
-  let contentLink = null;
-  if(type==='video') contentLink = await extractLink(archiveContentUrl, 'mp4');
-  else if(type==='pdf') contentLink = await extractLink(archiveContentUrl, 'pdf');
+  const payload={archive_content_url:contentLink,archive_image_url:imageLink,title,username,phone_number:phone||'',type};
 
-  if(!contentLink){
-    respArea.textContent = 'Could not extract required content link. Provide a direct .mp4 or .pdf URL in Archive Content URL.';
-    return;
-  }
-
-  respArea.textContent = 'Extracting image link...';
-  let imageLink = await extractLink(archiveImageUrl, 'jpg');
-  if(!imageLink) imageLink = await extractLink(archiveImageUrl, 'jpeg');
-  if(!imageLink){
-    // fallback if the provided image URL ends with image ext
-    if(urlEndsWithExt(archiveImageUrl, 'jpg') || urlEndsWithExt(archiveImageUrl, 'jpeg') || urlEndsWithExt(archiveImageUrl, 'png')){
-      imageLink = archiveImageUrl;
-    }
-  }
-  if(!imageLink){
-    respArea.textContent = 'Could not extract image (jpg/jpeg). Provide a direct image URL in Archive Image URL.';
-    return;
-  }
-
-  const payload = {
-    archive_content_url: contentLink,
-    archive_image_url: imageLink,
-    title,
-    username: posterUsername,
-    phone_number: phoneNumber || '',
-    type
-  };
-
-  respArea.textContent = 'Sending to backend...';
+  respArea.textContent='Sending data...';
   try{
-    const r = await fetch(backendUrl, {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const text = await r.text();
-    if(r.ok) respArea.textContent = 'Success. Server response:\n\n' + text;
-    else respArea.textContent = 'Server returned error '+r.status+':\n\n' + text;
+    const r=await fetch(backendUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const t=await r.text();
+    if(r.ok) respArea.textContent='✅ Success:\n'+t;
+    else respArea.textContent='❌ Error '+r.status+': '+t;
   }catch(err){
-    respArea.textContent = 'Network / CORS error when contacting backend: ' + String(err);
-    console.error(err);
+    respArea.textContent='Network error: '+err;
   }
 });
 
-/* -----------------------
-  Init on load
-------------------------*/
-window.addEventListener('load', ()=>{
-  setStatus('Ready — loading encrypted users...');
-  loadEncryptedUsers();
-});
+/* -------- Init -------- */
+window.addEventListener('load',loadEncryptedUsers);
 </script>
 </body>
 </html>
