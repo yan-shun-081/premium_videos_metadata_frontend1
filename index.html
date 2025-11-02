@@ -29,10 +29,8 @@
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
-    z-index: 0;
   }
 
-  /* Gradient stays behind all inputs */
   .gradient-bg {
     position: fixed;
     top: -50%;
@@ -43,7 +41,7 @@
     filter: blur(90px);
     z-index: 0;
     animation: float 8s infinite ease-in-out alternate;
-    pointer-events: none; /* don't block clicks */
+    pointer-events: none;
   }
 
   @keyframes float {
@@ -56,18 +54,18 @@
     width: 95%;
     max-width: 480px;
     position: relative;
-    z-index: 2; /* ensures inputs above background */
+    z-index: 2;
   }
 
   .card {
-    position: relative;
     background: var(--card);
     border-radius: 18px;
     padding: 26px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     margin-bottom: 24px;
-    animation: fadeIn 0.7s ease;
+    position: relative;
     z-index: 2;
+    animation: fadeIn 0.7s ease;
   }
 
   @keyframes fadeIn {
@@ -102,11 +100,8 @@
     margin-top: 6px;
     font-size: 0.95rem;
     background: #fff;
-    position: relative;
-    z-index: 3; /* ensure inputs focusable above everything */
     transition: box-shadow 0.2s, border 0.2s;
-    -webkit-appearance: none; /* more consistent select appearance on some browsers */
-    appearance: none;
+    -webkit-appearance: none;
   }
 
   input:focus, select:focus {
@@ -115,10 +110,10 @@
     box-shadow: 0 0 8px var(--primary);
   }
 
-  /* Add a simple chevron for the select without blocking pointer events */
   .select-wrap {
     position: relative;
   }
+
   .select-wrap::after {
     content: "▾";
     position: absolute;
@@ -127,8 +122,6 @@
     transform: translateY(-50%);
     pointer-events: none;
     color: #475569;
-    z-index: 4;
-    font-size: 0.95rem;
   }
 
   button {
@@ -142,7 +135,6 @@
     margin-top: 16px;
     width: 100%;
     transition: transform 0.2s, box-shadow 0.2s;
-    z-index: 3;
   }
 
   button:hover {
@@ -154,12 +146,7 @@
     background: var(--secondary);
   }
 
-  .small {
-    font-size: 0.9rem;
-    color: #475569;
-    margin-top: 8px;
-  }
-
+  .small { font-size: 0.9rem; color: #475569; margin-top: 8px; }
   .error { color: var(--error); font-weight: 600; }
   .success { color: var(--success); font-weight: 600; }
 
@@ -173,7 +160,6 @@
 
   .hidden { display: none; }
 
-  /* Animated border (visual only) */
   .card::before {
     content: "";
     position: absolute;
@@ -185,9 +171,9 @@
     animation: glow 8s ease infinite;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
-            mask-composite: exclude;
+    mask-composite: exclude;
     z-index: 1;
-    pointer-events: none; /* <--- CRITICAL: don't intercept clicks */
+    pointer-events: none;
   }
 
   @keyframes glow {
@@ -196,10 +182,7 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* Responsive small tweaks */
-  @media (max-width:420px){
-    .card { padding: 18px; border-radius: 14px; }
-  }
+  @media (max-width:420px){ .card { padding: 18px; border-radius: 14px; } }
 </style>
 </head>
 <body>
@@ -229,14 +212,11 @@
       <select id="type">
         <option value="video">Video</option>
         <option value="pdf">PDF</option>
-        <option value="image">Image</option>
-        <option value="zip">ZIP</option>
-        <option value="other">Other</option>
       </select>
     </div>
 
     <label>Archive Content URL</label>
-    <input id="archiveContentUrl" type="text" placeholder="Enter content URL (any file type)" />
+    <input id="archiveContentUrl" type="text" placeholder="Enter content URL" />
 
     <label>Thumbnail / Image URL</label>
     <input id="archiveImageUrl" type="text" placeholder="Enter image URL" />
@@ -253,7 +233,6 @@
     <button id="postBtn" type="button">🚀 Post Metadata</button>
     <button id="logoutBtn" class="secondary" type="button">Logout</button>
 
-    <p class="small">Backend: <code>https://premium_videos_metadata_backend.ajaia-backend.workers.dev/upload</code></p>
     <h3 style="margin-top:10px;">Response</h3>
     <pre id="responseArea">—</pre>
   </div>
@@ -264,15 +243,14 @@ const passphrase = "MyPassphrase123!";
 const encryptedFile = "encrypted.txt";
 const backendUrl = "https://premium_videos_metadata_backend.ajaia-backend.workers.dev/upload";
 
-/* -------- Utilities -------- */
+/* ---------------- Utility ---------------- */
 function setLoginStatus(msg, cls=''){ const el=document.getElementById('loginStatus'); el.textContent=msg; el.className=cls; }
 function debugShow(s){ const d=document.getElementById('debug'); d.textContent=s; d.classList.remove('hidden'); }
 function debugHide(){ document.getElementById('debug').classList.add('hidden'); }
-
 function b64ToArrayBuffer(b64){ const bin=atob(b64); const len=bin.length; const bytes=new Uint8Array(len); for(let i=0;i<len;i++) bytes[i]=bin.charCodeAt(i); return bytes.buffer; }
 function abToStr(buf){ return new TextDecoder().decode(buf); }
 
-/* -------- Crypto -------- */
+/* ---------------- Crypto ---------------- */
 async function deriveKey(pass, saltB64, iterations){
   const salt=new Uint8Array(b64ToArrayBuffer(saltB64));
   const pwUtf8=new TextEncoder().encode(pass);
@@ -288,7 +266,7 @@ async function decryptEncryptedJson(encJson){
   return abToStr(plainBuf);
 }
 
-/* -------- Load & Decrypt -------- */
+/* ---------------- Load & Decrypt ---------------- */
 let usersList=[];
 async function loadEncryptedUsers(){
   setLoginStatus('🔄 Loading encrypted file...');
@@ -309,7 +287,7 @@ async function loadEncryptedUsers(){
   }
 }
 
-/* -------- Login -------- */
+/* ---------------- Login ---------------- */
 document.getElementById('loginBtn').addEventListener('click',onLogin);
 document.getElementById('reloadBtn').addEventListener('click',loadEncryptedUsers);
 document.getElementById('logoutBtn').addEventListener('click',()=>{
@@ -330,22 +308,29 @@ async function onLogin(){
   document.getElementById('postUsername').value=u;
 }
 
-/* -------- Universal Link Extractor -------- */
-async function extractLink(url){
+/* ---------------- Link Extraction ---------------- */
+async function extractLink(url, type){
   if(!url) return null;
   try{
     const resp=await fetch(url,{mode:'cors'});
     if(!resp.ok) throw new Error('Fetch failed: '+resp.status);
     const html=await resp.text();
-    const rx=/https?:\/\/[^"'\\s>]+?\.(mp4|pdf|jpg|jpeg|png|zip|rar|gif|webm|mkv|avi|mov)/ig;
+    let rx;
+    if(type==='video' || type==='pdf'){
+      rx=/https?:\/\/[^"'\\s>]+?\.(mp4|pdf)/ig;
+    } else {
+      rx=/https?:\/\/[^"'\\s>]+?\.(jpg|jpeg|png)/ig;
+    }
     const match=rx.exec(html);
     if(match) return match[0];
   }catch(e){}
-  if(/\.(mp4|pdf|jpg|jpeg|png|zip|rar|gif|webm|mkv|avi|mov)$/i.test(url)) return url;
+  // fallback direct link
+  const ext=type==='video'||type==='pdf'? /\.(mp4|pdf)$/i : /\.(jpg|jpeg|png)$/i;
+  if(ext.test(url)) return url;
   return null;
 }
 
-/* -------- Post -------- */
+/* ---------------- Post Metadata ---------------- */
 document.getElementById('postBtn').addEventListener('click',async()=>{
   const type=document.getElementById('type').value;
   const archiveContentUrl=document.getElementById('archiveContentUrl').value.trim();
@@ -355,12 +340,17 @@ document.getElementById('postBtn').addEventListener('click',async()=>{
   const phone=document.getElementById('phoneNumber').value.trim();
   const respArea=document.getElementById('responseArea');
 
-  if(!archiveContentUrl||!archiveImageUrl||!title||!username){respArea.textContent='⚠️ Please fill all required fields.';return;}
-  respArea.textContent='🔍 Extracting content...';
-  const contentLink=await extractLink(archiveContentUrl);
-  const imageLink=await extractLink(archiveImageUrl);
-  if(!contentLink){respArea.textContent='❌ Cannot extract valid content URL';return;}
-  if(!imageLink){respArea.textContent='❌ Cannot extract valid image URL';return;}
+  if(!archiveContentUrl||!archiveImageUrl||!title||!username){
+    respArea.textContent='⚠️ Please fill all required fields.';
+    return;
+  }
+
+  respArea.textContent='🔍 Extracting content links...';
+  const contentLink=await extractLink(archiveContentUrl, type);
+  const imageLink=await extractLink(archiveImageUrl, 'image');
+
+  if(!contentLink){respArea.textContent='❌ No valid '+type.toUpperCase()+' link found';return;}
+  if(!imageLink){respArea.textContent='❌ No valid image link found';return;}
 
   const payload={archive_content_url:contentLink,archive_image_url:imageLink,title,username,phone_number:phone||'',type};
 
@@ -368,14 +358,13 @@ document.getElementById('postBtn').addEventListener('click',async()=>{
   try{
     const r=await fetch(backendUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const t=await r.text();
-    if(r.ok) respArea.textContent='✅ Success:\n'+t;
-    else respArea.textContent='❌ Error '+r.status+': '+t;
+    respArea.textContent=r.ok?'✅ Success:\n'+t:'❌ Error '+r.status+': '+t;
   }catch(err){
     respArea.textContent='🌐 Network error: '+err;
   }
 });
 
-/* -------- Init -------- */
+/* ---------------- Init ---------------- */
 window.addEventListener('load',loadEncryptedUsers);
 </script>
 </body>
