@@ -16,7 +16,6 @@
     --bg2: #1e293b;
     --card: #f9fafb;
   }
-
   body {
     font-family: 'Poppins', system-ui, sans-serif;
     background: linear-gradient(135deg, var(--bg1), var(--bg2));
@@ -30,33 +29,22 @@
     overflow-x: hidden;
     position: relative;
   }
-
   .gradient-bg {
     position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
     background: radial-gradient(circle at 50% 50%, #60a5fa40, #6366f140, #f472b640, transparent);
     filter: blur(90px);
     z-index: 0;
     animation: float 8s infinite ease-in-out alternate;
     pointer-events: none;
   }
-
   @keyframes float {
     0% { transform: translate(0, 0); opacity: 0.8; }
     50% { transform: translate(5%, -5%); opacity: 1; }
     100% { transform: translate(-5%, 5%); opacity: 0.8; }
   }
-
-  .wrap {
-    width: 95%;
-    max-width: 480px;
-    position: relative;
-    z-index: 2;
-  }
-
+  .wrap { width: 95%; max-width: 480px; position: relative; z-index: 2; }
   .card {
     background: var(--card);
     border-radius: 18px;
@@ -67,138 +55,65 @@
     z-index: 2;
     animation: fadeIn 0.7s ease;
   }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px) scale(0.97); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  h2 {
-    text-align: center;
-    color: var(--primary);
-    margin-bottom: 16px;
-    font-weight: 700;
-  }
-
-  label {
-    display: block;
-    margin-top: 10px;
-    font-weight: 600;
-    color: #334155;
-  }
-
-  input, select, button {
-    font-family: inherit;
-  }
-
+  @keyframes fadeIn { from {opacity: 0; transform: translateY(20px) scale(0.97);} to {opacity: 1; transform: translateY(0) scale(1);} }
+  h2 { text-align: center; color: var(--primary); margin-bottom: 16px; font-weight: 700; }
+  label { display: block; margin-top: 10px; font-weight: 600; color: #334155; }
+  input, select, button { font-family: inherit; }
   input, select {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid #cbd5e1;
-    box-sizing: border-box;
-    margin-top: 6px;
-    font-size: 0.95rem;
-    background: #fff;
+    width: 100%; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid #cbd5e1; box-sizing: border-box;
+    margin-top: 6px; font-size: 0.95rem; background: #fff;
     transition: box-shadow 0.2s, border 0.2s;
-    -webkit-appearance: none;
   }
-
   input:focus, select:focus {
-    outline: none;
-    border: 1px solid var(--primary);
-    box-shadow: 0 0 8px var(--primary);
+    outline: none; border: 1px solid var(--primary); box-shadow: 0 0 8px var(--primary);
   }
-
-  .select-wrap {
-    position: relative;
-  }
-
+  .select-wrap { position: relative; }
   .select-wrap::after {
-    content: "▾";
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: #475569;
+    content: "▾"; position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%); pointer-events: none; color: #475569;
   }
-
   button {
     background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
-    font-weight: 600;
-    border: 0;
-    border-radius: 10px;
-    padding: 12px 14px;
-    cursor: pointer;
-    margin-top: 16px;
-    width: 100%;
+    color: white; font-weight: 600; border: 0; border-radius: 10px;
+    padding: 12px 14px; cursor: pointer; margin-top: 16px; width: 100%;
     transition: transform 0.2s, box-shadow 0.2s;
   }
-
-  button:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 14px rgba(99,102,241,0.5);
-  }
-
-  button.secondary {
-    background: var(--secondary);
-  }
-
+  button:hover { transform: scale(1.03); box-shadow: 0 0 14px rgba(99,102,241,0.5); }
+  button.secondary { background: var(--secondary); }
   .small { font-size: 0.9rem; color: #475569; margin-top: 8px; }
   .error { color: var(--error); font-weight: 600; }
   .success { color: var(--success); font-weight: 600; }
-
-  pre {
-    background: #0f172a;
-    color: #e2e8f0;
-    border-radius: 10px;
-    padding: 12px;
-    overflow-x: auto;
-  }
-
+  pre { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 12px; overflow-x: auto; }
   .hidden { display: none; }
-
   .card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 2px;
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
     background: linear-gradient(135deg, var(--accent), var(--primary), var(--success));
-    background-size: 400% 400%;
-    animation: glow 8s ease infinite;
+    background-size: 400% 400%; animation: glow 8s ease infinite;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    z-index: 1;
-    pointer-events: none;
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    z-index: 1; pointer-events: none;
   }
-
   @keyframes glow {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
-
-  @media (max-width:420px){ .card { padding: 18px; border-radius: 14px; } }
 </style>
 </head>
 <body>
 <div class="gradient-bg"></div>
 
 <div class="wrap">
-
   <!-- LOGIN CARD -->
   <div class="card" id="loginCard">
     <h2>🔐 Secure Login</h2>
     <label>Username</label>
-    <input id="loginUser" type="text" autocomplete="username" placeholder="Enter username" />
+    <input id="loginUser" type="text" placeholder="Enter username" />
     <label>Password</label>
-    <input id="loginPass" type="password" autocomplete="current-password" placeholder="Enter password" />
-    <button id="loginBtn" type="button">Login</button>
-    <button id="reloadBtn" class="secondary" type="button">Reload encrypted file</button>
+    <input id="loginPass" type="password" placeholder="Enter password" />
+    <button id="loginBtn">Login</button>
+    <button id="reloadBtn" class="secondary">Reload encrypted file</button>
     <p class="small">Status: <span id="loginStatus">Waiting for encrypted data...</span></p>
     <pre id="debug" class="hidden"></pre>
   </div>
@@ -206,7 +121,6 @@
   <!-- APP CARD -->
   <div class="card hidden" id="appCard">
     <h2>📤 Upload Archive Metadata</h2>
-
     <label>Type</label>
     <div class="select-wrap">
       <select id="type">
@@ -214,38 +128,38 @@
         <option value="pdf">PDF</option>
       </select>
     </div>
-
     <label>Archive Content URL</label>
     <input id="archiveContentUrl" type="text" placeholder="Enter content URL" />
-
     <label>Thumbnail / Image URL</label>
     <input id="archiveImageUrl" type="text" placeholder="Enter image URL" />
-
     <label>Title</label>
     <input id="title" type="text" placeholder="Enter title" />
-
     <label>Username</label>
     <input id="postUsername" type="text" readonly />
-
     <label>Phone number (optional)</label>
     <input id="phoneNumber" type="text" placeholder="+91..." />
-
-    <button id="postBtn" type="button">🚀 Post Metadata</button>
-    <button id="logoutBtn" class="secondary" type="button">Logout</button>
-
+    <button id="postBtn">🚀 Post Metadata</button>
+    <button id="logoutBtn" class="secondary">Logout</button>
     <h3 style="margin-top:10px;">Response</h3>
     <pre id="responseArea">—</pre>
   </div>
 </div>
 
-<!-- === CONNECT BRIDGE === -->
+<!-- === CONNECT TO BRIDGE === -->
 <iframe src="bridge.html" id="bridgeFrame" style="display:none;"></iframe>
 
 <script>
-/* -------- Bridge Communication Section -------- */
+/* ---------------- BRIDGE COMMUNICATION ---------------- */
+function sendToBridge(type, data = {}) {
+  const frame = document.getElementById("bridgeFrame").contentWindow;
+  frame.postMessage({ type, ...data }, "*");
+}
+
 window.addEventListener("message", (event) => {
   const msg = event.data;
   if (!msg || typeof msg !== "object") return;
+
+  console.log("📩 Message from Bridge:", msg);
 
   switch (msg.type) {
     case "injectUsername":
@@ -276,24 +190,22 @@ window.addEventListener("message", (event) => {
       break;
   }
 });
-
-// Helper to send back info to bridge
-function sendToBridge(type, data = {}) {
-  const frame = document.getElementById("bridgeFrame").contentWindow;
-  frame.postMessage({ type, ...data }, "*");
-}
 </script>
 
-<!-- === Original Script (Unchanged) === -->
 <script>
+/* ---------------- MAIN APP LOGIC ---------------- */
 const passphrase = "MyPassphrase123!";
 const encryptedFile = "encrypted.txt";
 const backendUrl = "https://premium_videos_metadata_backend.ajaia-backend.workers.dev/upload";
 
-function setLoginStatus(msg, cls=''){ const el=document.getElementById('loginStatus'); el.textContent=msg; el.className=cls; }
+function setLoginStatus(msg, cls = '') {
+  const el = document.getElementById('loginStatus');
+  el.textContent = msg; el.className = cls;
+  sendToBridge("loginStatus", { message: msg, status: cls });
+}
 function debugShow(s){ const d=document.getElementById('debug'); d.textContent=s; d.classList.remove('hidden'); }
 function debugHide(){ document.getElementById('debug').classList.add('hidden'); }
-function b64ToArrayBuffer(b64){ const bin=atob(b64); const len=bin.length; const bytes=new Uint8Array(len); for(let i=0;i<len;i++) bytes[i]=bin.charCodeAt(i); return bytes.buffer; }
+function b64ToArrayBuffer(b64){ const bin=atob(b64); const bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return bytes.buffer; }
 function abToStr(buf){ return new TextDecoder().decode(buf); }
 
 async function deriveKey(pass, saltB64, iterations){
@@ -325,9 +237,11 @@ async function loadEncryptedUsers(){
     usersList=parsed;
     setLoginStatus('✅ Ready to login','success');
     debugHide();
+    sendToBridge("usersLoaded", { count: usersList.length });
   }catch(err){
     setLoginStatus('❌ Error: '+err.message,'error');
     debugShow(String(err));
+    sendToBridge("error", { message: err.message });
   }
 }
 
@@ -337,6 +251,7 @@ document.getElementById('logoutBtn').addEventListener('click',()=>{
   document.getElementById('appCard').classList.add('hidden');
   document.getElementById('loginCard').classList.remove('hidden');
   setLoginStatus('Logged out','');
+  sendToBridge("loggedOut");
 });
 
 async function onLogin(){
@@ -349,6 +264,7 @@ async function onLogin(){
   document.getElementById('loginCard').classList.add('hidden');
   document.getElementById('appCard').classList.remove('hidden');
   document.getElementById('postUsername').value=u;
+  sendToBridge("loginSuccess", { user: u });
 }
 
 async function extractLink(url, type){
@@ -357,16 +273,11 @@ async function extractLink(url, type){
     const resp=await fetch(url,{mode:'cors'});
     if(!resp.ok) throw new Error('Fetch failed: '+resp.status);
     const html=await resp.text();
-    let rx;
-    if(type==='video' || type==='pdf'){
-      rx=/https?:\/\/[^"'\\s>]+?\.(mp4|pdf)/ig;
-    } else {
-      rx=/https?:\/\/[^"'\\s>]+?\.(jpg|jpeg|png)/ig;
-    }
+    let rx=type==='video'||type==='pdf'?/https?:\/\/[^"'\\s>]+?\.(mp4|pdf)/ig:/https?:\/\/[^"'\\s>]+?\.(jpg|jpeg|png)/ig;
     const match=rx.exec(html);
     if(match) return match[0];
   }catch(e){}
-  const ext=type==='video'||type==='pdf'? /\.(mp4|pdf)$/i : /\.(jpg|jpeg|png)$/i;
+  const ext=type==='video'||type==='pdf'?/\.(mp4|pdf)$/i:/\.(jpg|jpeg|png)$/i;
   if(ext.test(url)) return url;
   return null;
 }
@@ -399,13 +310,14 @@ document.getElementById('postBtn').addEventListener('click',async()=>{
     const r=await fetch(backendUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const t=await r.text();
     respArea.textContent=r.ok?'✅ Success:\n'+t:'❌ Error '+r.status+': '+t;
+    sendToBridge("uploadResult", { success: r.ok, response: t });
   }catch(err){
     respArea.textContent='🌐 Network error: '+err;
+    sendToBridge("error", { message: err.message });
   }
 });
 
 window.addEventListener('load',loadEncryptedUsers);
 </script>
-
 </body>
 </html>
