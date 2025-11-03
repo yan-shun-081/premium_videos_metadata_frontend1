@@ -1,12 +1,20 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>Extractor</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Extractor</title>
+</head>
 <body>
 <script>
 async function extractMetadataAndLinks(url, type) {
   try {
-    const response = await fetch(url);
-    const html = await response.text();
+    // 🛡️ Use a proxy to bypass CORS
+    const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
+    const response = await fetch(proxyUrl);
+    const data = await response.json();
+    const html = data.contents;
+
+    // 🧩 Parse the HTML
     const doc = new DOMParser().parseFromString(html, "text/html");
 
     // --- Extract base metadata ---
@@ -15,9 +23,11 @@ async function extractMetadataAndLinks(url, type) {
     const ogImage = doc.querySelector("meta[property='og:image']")?.content || "";
 
     // --- Find all links in the document ---
-    const links = [...doc.querySelectorAll("a, source, video, img")].map(el => el.src || el.href || "").filter(Boolean);
+    const links = [...doc.querySelectorAll("a, source, video, img")]
+      .map(el => el.src || el.href || "")
+      .filter(Boolean);
 
-    // --- Helper functions ---
+    // --- Helper function ---
     const findLink = (pattern) => links.find(l => pattern.test(l));
 
     let mp4Link = findLink(/\.mp4(\?|$)/i);
@@ -39,18 +49,22 @@ async function extractMetadataAndLinks(url, type) {
       archiveImageUrl = ogImage || jpegLink || "";
     }
 
+    console.log("✅ Extracted metadata:", { title, description, archiveContentUrl, archiveImageUrl });
+
     return { title, description, archiveContentUrl, archiveImageUrl };
+
   } catch (err) {
-    console.error("Extraction failed:", err);
+    console.error("❌ Extraction failed:", err);
     return null;
   }
 }
 
-// Listen for bridge messages
+// 📩 Listen for messages from bridge or parent
 window.addEventListener("message", async (event) => {
   const msg = event.data;
   if (msg.type === "extractFromUrl") {
     const { url, contentType } = msg;
+    console.log("🔍 Extracting from:", url);
     const extracted = await extractMetadataAndLinks(url, contentType);
     if (extracted) {
       window.parent.postMessage({ type: "extractionComplete", data: extracted }, "*");
