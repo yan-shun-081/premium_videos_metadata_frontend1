@@ -159,32 +159,25 @@ window.addEventListener("message", (event) => {
   const msg = event.data;
   if (!msg || typeof msg !== "object") return;
 
-  console.log("📩 Message from Bridge:", msg);
-
   switch (msg.type) {
     case "injectUsername":
       document.getElementById("postUsername").value = msg.value || "";
       break;
-
     case "triggerLogin":
       document.getElementById("loginUser").value = msg.username || "";
       document.getElementById("loginPass").value = msg.password || "";
       document.getElementById("loginBtn").click();
       break;
-
     case "triggerSend":
       document.getElementById("postBtn").click();
       break;
-
     case "disablePost":
       document.getElementById("postBtn").disabled = true;
       document.getElementById("responseArea").textContent = "Posting disabled by bridge.";
       break;
-
     case "reloadEncrypted":
       document.getElementById("reloadBtn").click();
       break;
-
     case "logout":
       document.getElementById("logoutBtn").click();
       break;
@@ -198,6 +191,12 @@ const passphrase = "MyPassphrase123!";
 const encryptedFile = "encrypted.txt";
 const backendUrl = "https://premium_videos_metadata_backend.ajaia-backend.workers.dev/upload";
 
+/* --- Extraction Request Trigger --- */
+async function triggerExtraction(url, type) {
+  sendToBridge("extractFromUrl", { url, contentType: type });
+}
+
+/* --- Decryption Logic --- */
 function setLoginStatus(msg, cls = '') {
   const el = document.getElementById('loginStatus');
   el.textContent = msg; el.className = cls;
@@ -254,6 +253,7 @@ document.getElementById('logoutBtn').addEventListener('click',()=>{
   sendToBridge("loggedOut");
 });
 
+/* --- Login Logic --- */
 async function onLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value;
@@ -267,54 +267,60 @@ async function onLogin(){
   sendToBridge("loginSuccess", { user: u });
 }
 
-async function extractLink(url, type){
-  if(!url) return null;
-  try{
-    const resp=await fetch(url,{mode:'cors'});
-    if(!resp.ok) throw new Error('Fetch failed: '+resp.status);
-    const html=await resp.text();
-    let rx=type==='video'||type==='pdf'?/https?:\/\/[^"'\\s>]+?\.(mp4|pdf)/ig:/https?:\/\/[^"'\\s>]+?\.(jpg|jpeg|png)/ig;
-    const match=rx.exec(html);
-    if(match) return match[0];
-  }catch(e){}
-  const ext=type==='video'||type==='pdf'?/\.(mp4|pdf)$/i:/\.(jpg|jpeg|png)$/i;
-  if(ext.test(url)) return url;
-  return null;
-}
+/* --- Post Metadata Button with Extraction --- */
+document.getElementById('postBtn').addEventListener('click', async () => {
+  const type = document.getElementById('type').value;
+  const archiveContentUrl = document.getElementById('archiveContentUrl').value.trim();
+  const archiveImageUrl = document.getElementById('archiveImageUrl').value.trim();
+  const title = document.getElementById('title').value.trim();
+  const username = document.getElementById('postUsername').value.trim();
+  const phone = document.getElementById('phoneNumber').value.trim();
+  const respArea = document.getElementById('responseArea');
 
-document.getElementById('postBtn').addEventListener('click',async()=>{
-  const type=document.getElementById('type').value;
-  const archiveContentUrl=document.getElementById('archiveContentUrl').value.trim();
-  const archiveImageUrl=document.getElementById('archiveImageUrl').value.trim();
-  const title=document.getElementById('title').value.trim();
-  const username=document.getElementById('postUsername').value.trim();
-  const phone=document.getElementById('phoneNumber').value.trim();
-  const respArea=document.getElementById('responseArea');
-
-  if(!archiveContentUrl||!archiveImageUrl||!title||!username){
-    respArea.textContent='⚠️ Please fill all required fields.';
+  if (!archiveContentUrl || !archiveImageUrl || !title || !username) {
+    respArea.textContent = '⚠️ Please fill all required fields.';
     return;
   }
 
-  respArea.textContent='🔍 Extracting content links...';
-  const contentLink=await extractLink(archiveContentUrl, type);
-  const imageLink=await extractLink(archiveImageUrl, 'image');
+  respArea.textContent = '🔍 Extracting metadata via bridge...';
+  triggerExtraction(archiveContentUrl, type);
 
-  if(!contentLink){respArea.textContent='❌ No valid '+type.toUpperCase()+' link found';return;}
-  if(!imageLink){respArea.textContent='❌ No valid image link found';return;}
+  window.addEventListener("message", async function handleExtraction(event) {
+    const msg = event.data;
+    if (msg.type === "extractionComplete") {
+      window.removeEventListener("message", handleExtraction);
+      const { archiveContentUrl, archiveImageUrl } = msg.data;
 
-  const payload={archive_content_url:contentLink,archive_image_url:imageLink,title,username,phone_number:phone||'',type};
+      const payload = {
+        archive_content_url: archiveContentUrl,
+        archive_image_url: archiveImageUrl,
+        title,
+        username,
+        phone_number: phone || '',
+        type,
+      };
 
-  respArea.textContent='🚀 Sending data...';
-  try{
-    const r=await fetch(backendUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const t=await r.text();
-    respArea.textContent=r.ok?'✅ Success:\n'+t:'❌ Error '+r.status+': '+t;
-    sendToBridge("uploadResult", { success: r.ok, response: t });
-  }catch(err){
-    respArea.textContent='🌐 Network error: '+err;
-    sendToBridge("error", { message: err.message });
-  }
+      respArea.textContent = '🚀 Sending data...';
+      try {
+        const r = await fetch(backendUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const t = await r.text();
+        respArea.textContent = r.ok ? '✅ Success:\n' + t : '❌ Error ' + r.status + ': ' + t;
+        sendToBridge("uploadResult", { success: r.ok, response: t });
+      } catch (err) {
+        respArea.textContent = '🌐 Network error: ' + err;
+        sendToBridge("error", { message: err.message });
+      }
+    }
+
+    if (msg.type === "extractionFailed") {
+      window.removeEventListener("message", handleExtraction);
+      respArea.textContent = '❌ Metadata extraction failed.';
+    }
+  });
 });
 
 window.addEventListener('load',loadEncryptedUsers);
