@@ -8,11 +8,32 @@
 <script>
 async function extractMetadataAndLinks(url, type) {
   try {
-    // 🛡️ Use a proxy to bypass CORS
-    const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
-    const response = await fetch(proxyUrl);
-    const data = await response.json();
-    const html = data.contents;
+    // 🧩 Try multiple CORS proxies (fallback system)
+    const proxyList = [
+      "https://corsproxy.io/?",
+      "https://api.codetabs.com/v1/proxy?quest=",
+      "https://thingproxy.freeboard.io/fetch/"
+    ];
+
+    let html = null;
+    let lastError = null;
+
+    for (const proxy of proxyList) {
+      try {
+        console.log("🌐 Trying proxy:", proxy);
+        const response = await fetch(proxy + encodeURIComponent(url));
+        html = await response.text();
+        if (html && html.length > 0) {
+          console.log("✅ Success via proxy:", proxy);
+          break;
+        }
+      } catch (err) {
+        console.warn("⚠️ Proxy failed:", proxy, err);
+        lastError = err;
+      }
+    }
+
+    if (!html) throw lastError || new Error("All proxies failed");
 
     // 🧩 Parse the HTML
     const doc = new DOMParser().parseFromString(html, "text/html");
@@ -22,19 +43,18 @@ async function extractMetadataAndLinks(url, type) {
     const description = doc.querySelector("meta[name='description']")?.content || "";
     const ogImage = doc.querySelector("meta[property='og:image']")?.content || "";
 
-    // --- Find all links in the document ---
+    // --- Find all links ---
     const links = [...doc.querySelectorAll("a, source, video, img")]
       .map(el => el.src || el.href || "")
       .filter(Boolean);
 
-    // --- Helper function ---
     const findLink = (pattern) => links.find(l => pattern.test(l));
 
     let mp4Link = findLink(/\.mp4(\?|$)/i);
     let pdfLink = findLink(/\.pdf(\?|$)/i);
     let jpegLink = findLink(/\.(jpg|jpeg|png)(\?|$)/i);
 
-    // --- Choose replacements based on type ---
+    // --- Choose URLs based on type ---
     let archiveContentUrl = "";
     let archiveImageUrl = "";
 
@@ -59,7 +79,7 @@ async function extractMetadataAndLinks(url, type) {
   }
 }
 
-// 📩 Listen for messages from bridge or parent
+// 📩 Listen for messages from parent
 window.addEventListener("message", async (event) => {
   const msg = event.data;
   if (msg.type === "extractFromUrl") {
