@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bridge</title>
+</head>
+<body>
+<script>
+// 🌐 CONFIGURATION — Add any feature/logic file URLs here
+const connectedFiles = [
+  "feature1.html",
+  "feature2.js",
+  "disableFeature.html",
+  "shareFeature.js"
+];
+
+// 🔄 Store iframe references
+const childFrames = [];
+
+// ✅ STEP 1: Load all connected files dynamically
+function loadConnectedFiles() {
+  connectedFiles.forEach((file, i) => {
+    const ext = file.split('.').pop().toLowerCase();
+
+    // If it's an HTML file -> load in hidden iframe
+    if (ext === "html") {
+      const iframe = document.createElement("iframe");
+      iframe.src = file;
+      iframe.style.display = "none";
+      iframe.dataset.file = file;
+      document.body.appendChild(iframe);
+      childFrames.push(iframe.contentWindow);
+      console.log("🔗 Connected:", file);
+    }
+
+    // If it's a JS file -> inject script tag
+    else if (ext === "js") {
+      const script = document.createElement("script");
+      script.src = file;
+      script.dataset.file = file;
+      script.onload = () => console.log("⚙️ JS Connected:", file);
+      document.body.appendChild(script);
+    }
+  });
+}
+
+// ✅ STEP 2: Message routing system
+// The bridge connects main (parent) <-> all child logic files
+window.addEventListener("message", (event) => {
+  const msg = event.data;
+  if (!msg || !msg.type) return;
+
+  // 🧩 1. Received message from main index.html
+  if (event.source === window.parent) {
+    console.log("📥 From MAIN →", msg);
+    // Forward to all connected child files
+    childFrames.forEach(frame => {
+      frame.postMessage(msg, "*");
+    });
+  }
+
+  // ⚙️ 2. Received message from a child feature file
+  else {
+    console.log("📤 From CHILD →", msg);
+    // Forward message to main index.html
+    window.parent.postMessage(msg, "*");
+  }
+});
+
+// ✅ STEP 3: Example startup messages
+setTimeout(() => {
+  console.log("🚀 Bridge initialized, connecting to main page...");
+  window.parent.postMessage({ type: "bridgeReady" }, "*");
+}, 1000);
+
+// ✅ STEP 4: Start connection
+loadConnectedFiles();
+</script>
+</body>
+</html>
