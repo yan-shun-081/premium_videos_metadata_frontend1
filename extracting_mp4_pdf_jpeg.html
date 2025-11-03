@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Extractor</title></head>
+<body>
+<script>
+async function extractMetadataAndLinks(url, type) {
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    // --- Extract base metadata ---
+    const title = doc.querySelector("title")?.innerText || "Untitled";
+    const description = doc.querySelector("meta[name='description']")?.content || "";
+    const ogImage = doc.querySelector("meta[property='og:image']")?.content || "";
+
+    // --- Find all links in the document ---
+    const links = [...doc.querySelectorAll("a, source, video, img")].map(el => el.src || el.href || "").filter(Boolean);
+
+    // --- Helper functions ---
+    const findLink = (pattern) => links.find(l => pattern.test(l));
+
+    let mp4Link = findLink(/\.mp4(\?|$)/i);
+    let pdfLink = findLink(/\.pdf(\?|$)/i);
+    let jpegLink = findLink(/\.(jpg|jpeg|png)(\?|$)/i);
+
+    // --- Choose replacements based on type ---
+    let archiveContentUrl = "";
+    let archiveImageUrl = "";
+
+    if (type === "video") {
+      archiveContentUrl = mp4Link || url;
+      archiveImageUrl = ogImage || jpegLink || "";
+    } else if (type === "pdf") {
+      archiveContentUrl = pdfLink || url;
+      archiveImageUrl = ogImage || jpegLink || "";
+    } else {
+      archiveContentUrl = url;
+      archiveImageUrl = ogImage || jpegLink || "";
+    }
+
+    return { title, description, archiveContentUrl, archiveImageUrl };
+  } catch (err) {
+    console.error("Extraction failed:", err);
+    return null;
+  }
+}
+
+// Listen for bridge messages
+window.addEventListener("message", async (event) => {
+  const msg = event.data;
+  if (msg.type === "extractFromUrl") {
+    const { url, contentType } = msg;
+    const extracted = await extractMetadataAndLinks(url, contentType);
+    if (extracted) {
+      window.parent.postMessage({ type: "extractionComplete", data: extracted }, "*");
+    } else {
+      window.parent.postMessage({ type: "extractionFailed" }, "*");
+    }
+  }
+});
+</script>
+</body>
+</html>
